@@ -3,11 +3,27 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
+import { ChakraProvider } from '@chakra-ui/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {AuthProvider} from './components/hooks/useAuth';
+import './styles.css';
+
+
+const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <ChakraProvider>
+    <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+       </AuthProvider>
+    </QueryClientProvider>
+    </ChakraProvider>
   </React.StrictMode>
 );
 
