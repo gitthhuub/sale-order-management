@@ -1,18 +1,33 @@
+
+
+
+
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm} from 'react-hook-form';
+import {useState} from 'react';
 import {
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
   ModalBody, ModalCloseButton, Button, FormLabel, Input
 } from '@chakra-ui/react';
+import { addSaleOrder } from '../api/api.js';
 
 const SaleOrderForm = ({ isOpen, onClose, initialData }) => {
-  const { register, handleSubmit } = useForm({ defaultValues: initialData });
+  const { register, handleSubmit, reset } = useForm({ defaultValues: initialData });
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  const onSubmit = (data) => {
-    
-    console.log(data);
-    
-  };
+  const onSubmit = async (data) => {
+    try{
+    await addSaleOrder(data); 
+     setIsNavigating(true);
+     setTimeout(() => {
+      // Redirect to login page
+      window.location.href = '/login'; // Replace '/login' with the desired route
+    }, 0);
+  } catch (error) {
+    console.error('Error adding sale order:', error);
+  }
+} 
+
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -28,7 +43,6 @@ const SaleOrderForm = ({ isOpen, onClose, initialData }) => {
             <Input {...register('invoice_no')} required />
             <FormLabel>Invoice Date</FormLabel>
             <Input {...register('invoice_date')} type="date" required />
-            {/* Add other form fields as needed */}
             <Button type="submit" colorScheme="blue" mt="4">Submit</Button>
           </form>
         </ModalBody>
