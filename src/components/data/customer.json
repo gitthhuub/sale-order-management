@@ -1,4 +1,5 @@
-[
+
+  [
     {
       "id": 9,
       "customer": 11908,
@@ -10,9 +11,85 @@
         "pincode": "Mumbai",
         "location_name": "Mumbai, Maharashtra, India",
         "type": "C",
-        "profile_pic": null,
+        "profile_pic": "https://example.com/images/ram.png",
         "gst": ""
-      }
+      },
+      "price": 100,
+      "last_modified": "2024-04-12T11:20:00Z",
+      "paid": true
+    },
+    {
+      "id": 10,
+      "customer": 11909,
+      "customer_profile": {
+        "id": 11909,
+        "name": "John Doe",
+        "color": [255, 99, 132],
+        "email": "john_doe@example.com",
+        "pincode": "Delhi",
+        "location_name": "Delhi, India",
+        "type": "C",
+        "profile_pic": "https://example.com/images/john_doe.png",
+        "gst": ""
+      },
+      "price": 200,
+      "last_modified": "2024-04-14T15:30:00Z",
+      "paid": false
+    },
+    {
+      "id": 11,
+      "customer": 11910,
+      "customer_profile": {
+        "id": 11910,
+        "name": "Jane Smith",
+        "color": [54, 162, 235],
+        "email": "jane_smith@example.com",
+        "pincode": "Bangalore",
+        "location_name": "Bangalore, Karnataka, India",
+        "type": "C",
+        "profile_pic": "https://example.com/images/jane_smith.png",
+        "gst": ""
+      },
+      "price": 300,
+      "last_modified": "2024-04-16T09:45:00Z",
+      "paid": true
+    },
+    {
+      "id": 12,
+      "customer": 11911,
+      "customer_profile": {
+        "id": 11911,
+        "name": "Alice Johnson",
+        "color": [75, 192, 192],
+        "email": "alice_johnson@example.com",
+        "pincode": "Chennai",
+        "location_name": "Chennai, Tamil Nadu, India",
+        "type": "C",
+        "profile_pic": "https://example.com/images/alice_johnson.png",
+        "gst": ""
+      },
+      "price": 150,
+      "last_modified": "2024-04-18T13:00:00Z",
+      "paid": false
+    },
+    {
+      "id": 13,
+      "customer": 11912,
+      "customer_profile": {
+        "id": 11912,
+        "name": "Bob Brown",
+        "color": [153, 102, 255],
+        "email": "bob_brown@example.com",
+        "pincode": "Hyderabad",
+        "location_name": "Hyderabad, Telangana, India",
+        "type": "C",
+        "profile_pic": "https://example.com/images/bob_brown.png",
+        "gst": ""
+      },
+      "price": 250,
+      "last_modified": "2024-04-20T16:10:00Z",
+      "paid": true
     }
   ]
+  
   

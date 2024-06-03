@@ -1,57 +1,102 @@
 
 
 
-
-import React from 'react';
-import { useForm} from 'react-hook-form';
-import {useState} from 'react';
+import React, { useState } from 'react';
 import {
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
-  ModalBody, ModalCloseButton, Button, FormLabel, Input
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  FormLabel,
+  Input,
+  Select,
+  Box,
+  Text,
 } from '@chakra-ui/react';
-import { addSaleOrder } from '../api/api.js';
 
-const SaleOrderForm = ({ isOpen, onClose, initialData }) => {
-  const { register, handleSubmit, reset } = useForm({ defaultValues: initialData });
-  const [isNavigating, setIsNavigating] = useState(false);
+const SaleOrderForm = ({ isOpen, onClose }) => {
+  const [selectedProduct, setSelectedProduct] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [weight, setWeight] = useState('');
 
-  const onSubmit = async (data) => {
-    try{
-    await addSaleOrder(data); 
-     setIsNavigating(true);
-     setTimeout(() => {
-      // Redirect to login page
-      window.location.href = '/login'; // Replace '/login' with the desired route
-    }, 0);
-  } catch (error) {
-    console.error('Error adding sale order:', error);
-  }
-} 
+  const products = [
+    { id: 1, name: 'Product 1', price: 100, stock: 104, weight: '1 kg' },
+    { id: 2, name: 'Product 2', price: 200, stock: 46, weight: '2 kg' },
+    { id: 3, name: 'Product 3', price: 300, stock: 234, weight: '1.5 kg' },
+    {id:4, name:'product 4', price:350, stock:345, weight: '2.4 kg'},
+    {id:5, name:'product 5', price:400, stock:385, weight: '2.0 kg'},
+    {id:6, name:'product 6', price:500, stock:455, weight: '3.4 kg'},
+  ];
 
+  const handleProductChange = (e) => {
+    setSelectedProduct(e.target.value);
+    const product = products.find(p => p.id === parseInt(e.target.value));
+    if (product) {
+      setWeight(product.weight);
+    }
+  };
+
+  const handleQuantityChange = (e) => {
+    setQuantity(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const product = products.find(p => p.id === parseInt(selectedProduct));
+    if (product) {
+      console.log({
+        product: product.name,
+        price: product.price,
+        quantity,
+        weight,
+      });
+    }
+    onClose();
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create/Edit Sale Order</ModalHeader>
+        <ModalHeader>Product Sale Order</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <FormLabel>Customer ID</FormLabel>
-            <Input {...register('customer_id')} required />
-            <FormLabel>Invoice No</FormLabel>
-            <Input {...register('invoice_no')} required />
-            <FormLabel>Invoice Date</FormLabel>
-            <Input {...register('invoice_date')} type="date" required />
-            <Button type="submit" colorScheme="blue" mt="4">Submit</Button>
-          </form>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="ghost" onClick={onClose}>Close</Button>
-        </ModalFooter>
+        <form onSubmit={handleSubmit}>
+          <ModalBody>
+            <FormLabel>All Products</FormLabel>
+            <Select placeholder="Select product" value={selectedProduct} onChange={handleProductChange}>
+              {products.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </Select>
+            {selectedProduct && (
+              <>
+                <Box mt={4}>
+                  <Text>Sales Price: ₹{products.find(p => p.id === parseInt(selectedProduct)).price}</Text>
+                  <Text>Stock: {products.find(p => p.id === parseInt(selectedProduct)).stock} items remaining</Text>
+                  <Text>Weight: {weight}</Text>
+                </Box>
+                <FormLabel mt={4}>Quantity</FormLabel>
+                <Input type="number" value={quantity} onChange={handleQuantityChange} />
+              </>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} type="submit">
+              Save
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </form>
       </ModalContent>
     </Modal>
   );
 };
 
 export default SaleOrderForm;
+

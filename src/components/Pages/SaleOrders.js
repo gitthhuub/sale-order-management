@@ -1,12 +1,11 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { Button, Box, Tabs, TabList, TabPanels, Tab, TabPanel, Flex } from '@chakra-ui/react';
 import { useAuth } from '../hooks/useAuth';
-// import SaleOrderForm from './SaleOrderForm.js';
-import SaleOrderForm from './SaleOrderForm'
+import SaleOrderForm from './SaleOrderForm';
 import SaleOrderList from './saleOrderList';
-import { getSaleOrders } from '../api/api'; // Ensure correct path
+import { getSaleOrders } from '../api/api'; 
 
 const SaleOrders = () => {
   const { logout } = useAuth();
@@ -32,15 +31,19 @@ const SaleOrders = () => {
   return (
     <Box>
       <Button onClick={logout} colorScheme="red" mt="4">Logout</Button>
-      <Tabs>
-        <TabList>
-          <Tab>Active Sale Orders</Tab>
-          <Tab>Completed Sale Orders</Tab>
-        </TabList>
+      <Flex justify="space-between" align="center" mt="4">
+        <Tabs>
+          <TabList>
+            <Tab>Active Sale Orders</Tab>
+            <Tab>Completed Sale Orders</Tab>
+          </TabList>
+        </Tabs>
+        <Button onClick={() => openModal()} colorScheme="blue">+ Sale Order</Button>
+      </Flex>
 
+      <Tabs>
         <TabPanels>
           <TabPanel>
-            <Button onClick={() => openModal()} colorScheme="blue">+ Sale Order</Button>
             <SaleOrderList status="active" saleOrders={saleOrders} openModal={openModal} />
           </TabPanel>
           <TabPanel>
@@ -55,4 +58,3 @@ const SaleOrders = () => {
 };
 
 export default SaleOrders;
-

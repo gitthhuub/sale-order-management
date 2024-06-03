@@ -1,45 +1,18 @@
-// import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-
-// const useAuth = () => {
-//   const [isAuth, setIsAuth] = useState(false);
-//   const navigate = useNavigate();
-
-//   const login = (username, password) => {
-//     if (username === 'user' && password === 'pass') {
-//       setIsAuth(true);
-//       navigate('/');
-//     } else {
-//       alert('Invalid credentials');
-//     }
-//   };
-
-//   const logout = () => {
-//     setIsAuth(false);
-//     navigate('/login');
-//   };
-
-//   return {
-//     isAuthenticated,
-//     login,
-//     logout,
-//   };
-// };
-
-// export default useAuth;
-
 
 
 import React, { createContext, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+const useAuthProvider = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   const login = (username, password) => {
     if (username === 'user' && password === 'pass') {
       setIsAuthenticated(true);
+      navigate('/');
       return true;
     } else {
       alert('Invalid credentials');
@@ -49,15 +22,27 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setIsAuthenticated(false);
+    navigate('/login');
   };
 
+  return {
+    isAuthenticated,
+    login,
+    logout,
+  };
+};
+
+export const AuthProvider = ({ children }) => {
+  const auth = useAuthProvider();
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={auth}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
+
 
 

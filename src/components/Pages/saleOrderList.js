@@ -1,177 +1,150 @@
-// import React from 'react';
-// import { useQuery } from '@tanstack/react-query';
-// // import { fetchSaleOrders } from '../api/api';
-
-// import { Box, Button, Text, useColorMode } from '@chakra-ui/react';
-// // import SaleOrderModal from './SaleOrderModal';
-
-// const SaleOrderList = ({ status }) => {
-//   const { data: saleOrders, isLoading, error } = useQuery(['saleOrders', status], () => fetchSaleOrders(status));
-//   const { colorMode } = useColorMode();
-
-//   if (isLoading) return <Text>Loading...</Text>;
-//   if (error) return <Text>Error: {error.message}</Text>;
-
-//   return (
-//     <Box>
-//       {saleOrders.map(order => (
-//         <Box
-//           key={order.id}
-//           p={4}
-//           mb={4}
-//           borderWidth={1}
-//           borderRadius="md"
-//           borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
-//           bg={colorMode === 'light' ? 'white' : 'gray.800'}
-//         >
-//           <Text>Invoice No: {order.invoice_no}</Text>
-//           <Text>Customer: {order.customer_id}</Text>
-//           <Text>Invoice Date: {order.invoice_date}</Text>
-//           <SaleOrderModal order={order} readOnly={status === 'completed'} />
-//         </Box>
-//       ))}
-//     </Box>
-//   );
-// };
-
-// export default SaleOrderList;
-
-
-// import React from 'react';
-// import { Box, Text, Button, useDisclosure } from '@chakra-ui/react';
-// // import SaleOrderForm from './SaleOrderForm';
-// import SaleOrderForm from '../SaleOrderForm';
-// import { useQuery } from '@tanstack/react-query';
-// import { getSaleOrders } from '../api/api';  // Correct import
-
-// const SaleOrderList = ({ status }) => {
-//   const { isOpen, onOpen, onClose } = useDisclosure();
-//   const { data: saleOrders, isLoading } = useQuery(['saleOrders', status], getSaleOrders);
-
-//   if (isLoading) {
-//     return <Text>Loading...</Text>;
-//   }
-
-//   return (
-//     <Box>
-//       {saleOrders.filter(order => order.paid === (status === 'completed')).map(order => (
-//         <Box key={order.id} p={4} shadow="md" borderWidth="1px">
-//           <Text>Order ID: {order.id}</Text>
-//           <Text>Customer: {order.customer_profile.name}</Text>
-//           <Button onClick={onOpen}>Edit</Button>
-//           <SaleOrderForm isOpen={isOpen} onClose={onClose} initialData={order} />
-//         </Box>
-//       ))}
-//     </Box>
-//   );
-// };
-
-// export default SaleOrderList;
-
-
-// import React, { useEffect, useState } from 'react';
-// import { getSaleOrders } from '../api/api';
-// import { Box, Text, Spinner } from '@chakra-ui/react';
-
-// const SaleOrderList = ({ isCompleted }) => {
-//   const [data, setData] = useState([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchSaleOrders = async () => {
-//       try {
-//         const saleOrders = await getSaleOrders();
-//         setData(saleOrders);
-//       } catch (err) {
-//         setError(err);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-
-//     fetchSaleOrders();
-//   }, []);
-
-//   if (isLoading) {
-//     return <Spinner />;
-//   }
-
-//   if (error) {
-//     return <Text>Error loading sale orders</Text>;
-//   }
-
-//   const filteredOrders = data.filter(order => order.paid === isCompleted);
-
-//   return (
-//     <Box>
-//       {filteredOrders.length === 0 ? (
-//         <Text>No {isCompleted ? 'completed' : 'active'} sale orders</Text>
-//       ) : (
-//         filteredOrders.map(order => (
-//           <Box key={order.id} borderWidth="1px" borderRadius="lg" p="4" mb="4">
-//             <Text>Invoice No: {order.invoice_no}</Text>
-//             <Text>Invoice Date: {order.invoice_date}</Text>
-//             <Text>Paid: {order.paid ? 'Yes' : 'No'}</Text>
-//           </Box>
-//         ))
-//       )}
-//     </Box>
-//   );
-// };
-
-// export default SaleOrderList;
-
-
 
 
 import React, { useEffect, useState } from 'react';
-import { getSaleOrders } from '../api/api';
-import { Box, Text, Spinner } from '@chakra-ui/react';
+import { getSaleOrders, saveSaleOrders } from '../api/api';
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Text,
+  Spinner,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react';
+// import { EditIcon } from '@chakra-ui/icons';
+import EditSaleOrder from './EditSaleOrder';
+
+import { createIcon } from "@chakra-ui/icons";
+
+const ThreeDotsIcon = createIcon({
+  displayName: 'ThreeDotsIcon',
+  viewBox: '0 0 24 24',
+  path: (
+    <g fill="white">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </g>
+  ),
+});
 
 const SaleOrderList = ({ status }) => {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
-    const fetchSaleOrders = async () => {
+    const fetchOrders = async () => {
       try {
-        const saleOrders = await getSaleOrders();
-        setData(saleOrders);
-      } catch (err) {
-        setError(err);
+        const result = await getSaleOrders();
+        setOrders(result);
+      } catch (error) {
+        setErr(error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchSaleOrders();
+    fetchOrders();
   }, []);
 
-  if (isLoading) {
+  const handleEditClick = (order) => {
+    setSelectedOrder(order);
+    setEditModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setEditModalOpen(false);
+    setSelectedOrder(null);
+  };
+
+  const handleSave = async (updatedOrder) => {
+    const updatedOrders = orders.map((order) =>
+      order.id === updatedOrder.id ? updatedOrder : order
+    );
+    setOrders(updatedOrders);
+    await saveSaleOrders(updatedOrders);
+  };
+
+  if (loading) {
     return <Spinner />;
   }
 
-  if (error) {
-    return <Text>Error loading sale orders</Text>;
+  if (err) {
+    return <Text>Error loading sale orders: {err.message}</Text>;
   }
 
-  const isCompleted = status === 'completed';
-  const filteredOrders = data.filter(order => order.paid === isCompleted);
+  const filteredOrders = orders.filter(order =>
+    status === 'completed' ? order.paid : !order.paid
+  );
 
   return (
     <Box>
       {filteredOrders.length === 0 ? (
-        <Text>No {isCompleted ? 'completed' : 'active'} sale orders</Text>
+        <Text>No {status === 'completed' ? 'completed' : 'active'} sale orders</Text>
       ) : (
-        filteredOrders.map(order => (
-          <Box key={order.id} borderWidth="1px" borderRadius="lg" p="4" mb="4">
-            <Text>Invoice No: {order.invoice_no}</Text>
-            <Text>Invoice Date: {order.invoice_date}</Text>
-            <Text>Paid: {order.paid ? 'Yes' : 'No'}</Text>
-          </Box>
-        ))
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>ID</Th>
+              <Th>Customer Name</Th>
+              <Th>Email</Th>
+              <Th>Price (₹)</Th>
+              <Th>Last Modified</Th>
+              <Th>Edit/View</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {filteredOrders.map(order => (
+              <Tr key={order.id}>
+                <Td>{order.id}</Td>
+                <Td>
+                  {order.customer_profile ? (
+                    <Box display="flex" alignItems="center">
+                      <Avatar name={order.customer_profile.name} src={order.customer_profile.profile_pic} size="sm" />
+                      <Box ml="3">
+                        <Text fontWeight="bold">{order.customer_profile.name}</Text>
+                        <Text fontSize="sm">{order.customer_profile.email}</Text>
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Text>No customer profile</Text>
+                  )}
+                </Td>
+                <Td>{order.customer_profile.email}</Td>
+                <Td>₹{order.price}</Td>
+                <Td>{new Date(order.last_modified).toLocaleString()}</Td>
+                <Td>
+                  <Menu>
+                    <MenuButton as={IconButton} icon={<ThreeDotsIcon />} />
+                    <MenuList>
+                      <MenuItem onClick={() => handleEditClick(order)}>Edit/View</MenuItem>
+                    </MenuList>
+                  </Menu>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      )}
+      {editModalOpen && selectedOrder && (
+        <EditSaleOrder
+          isOpen={editModalOpen}
+          onClose={handleModalClose}
+          order={selectedOrder}
+          status={status}
+          onSave={handleSave}
+        />
       )}
     </Box>
   );
